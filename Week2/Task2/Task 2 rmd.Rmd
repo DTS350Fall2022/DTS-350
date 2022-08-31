@@ -1,0 +1,96 @@
+---
+title: "Task 2"
+author: "Hayden Armour"
+date: "8/30/2022"
+output: 
+  html_document:
+    keep_md: true
+---
+
+
+```{r}
+library('knitr')
+```
+
+```{r}
+sin(pi / 4)
+```
+###performed arithmetic and found that sin(pi/4) is .7071068
+
+
+
+```{r}
+x <- 10/3
+```
+###assigned x the value 10/3 (3.33 repeating)
+###names that are allowed: objects that start with a letter, and only contain letters, numbers, "_" and "."...... x works, y works, r_rocks works, i_use_snake_case works
+###names that arent allowed: (in this case) X, Y, y, 1_x_y, _x, x!, etc. 
+###why those names arent allowed: they are not the same as "x", some do not start with a letter, some contain punctuation that is not allowed 
+
+
+```{r}
+(MySequence <- seq(1,50, length.out = 7))
+```
+###created a sequence between 1-50 and it selects 7 evenely spaced numbers between that constraint
+
+
+```{r}
+my_vector <- c(1,5,12,31,19)
+```
+###created a vector that is filled with the numbers 1,5,12,31,19
+
+
+
+```{r}
+7+5==12
+```
+###the result of 7+5 is 12; that is why it returns true.
+### == means equal to. Simply putting = is not the same 
+
+
+
+```{r}
+(7+4=12)|(5-4=1)
+```
+###you recieve an error when the code is ran - this is because, as stated above, = and == are not the same thing. To fix it, simply add an extra equals sign to each of the expressions. 
+###the | sign, will return true if either of the operands are true
+###we would get a true back if we replaced the single equal signs, with double equal signs. That is because 7+4 is 12, and also 5-4 is 1. 
+
+
+
+#problem 1 - why does this code not work 
+```{r}
+my_variable <- 10
+my_varıable
+```
+###this code does not work becuase when we call on my_variable, the i does not have a dot - there is a syntax error that could be corrected simply by retyping my_variable the correct way 
+
+
+
+#problem 2 - Tweak each of the following R commands so that they run correctly
+```{r}
+ggplot(dota = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+
+fliter(mpg, cyl = 8)
+filter(diamond, carat > 3)
+```
+
+###the first code chunk, ggplot, does not work because data is spelled "dota"
+###the second code chunk, filter, does not work because it is spelled "fliter" 
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+
+filter(mpg, cyl == 8)
+filter(diamonds, carat > 3)
+```
+
+###the first code chunk is fixed simply by spelling data the correct way
+###the second code chunk is fixed by adding an "s" to diamond. When you start typing diamond, it autmoatically pulls up diamond, indicating it was simply spelled wrong. 
+
+
+#problem 3 - Press Alt + Shift + K. What happens? How can you get to the same place using the menus?
+###it pulls up a keyboard shortcut quick reference guide. To get to the same place using menus, you go to help in the taskbar, click on "keyboard shortcuts help" and the menu autmoatically pulls up 
+
