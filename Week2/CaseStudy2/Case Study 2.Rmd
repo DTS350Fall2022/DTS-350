@@ -1,0 +1,38 @@
+---
+title: "Case Study 2"
+author: "Hayden Armour"
+date: "9/4/2022"
+output: 
+  html_document:
+    keep_md: true
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r}
+library(tidyverse)
+
+urlfile = "https://github.com/WJC-Data-Science/DTS350/raw/master/coral.csv"
+mydata <- read_csv(url(urlfile))
+head(mydata)
+str(mydata)
+tail(mydata)
+```
+
+
+```{r}
+ggplot(data = mydata, aes(fill = Event, y = Value, x = Year)) +
+  geom_bar(position = 'Stack', stat = 'identity') +
+  facet_wrap(~Entity, nrow = 3, scales = 'free') +
+  scale_fill_manual(values = c('deepskyblue4', 'brown4'))
+```
+
+
+
+```{r}
+ggplot(data = mydata) +
+  geom_smooth(aes(x = Year, y = Value, fill = Entity)) +
+  facet_wrap(~Entity)
+```
+
