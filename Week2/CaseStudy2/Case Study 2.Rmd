@@ -4,7 +4,7 @@ author: "Hayden Armour"
 date: "9/4/2022"
 output: 
   html_document:
-    keep_md: true
+    keep_md: TRUE
 editor_options: 
   chunk_output_type: console
 ---
