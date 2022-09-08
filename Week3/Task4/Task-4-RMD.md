@@ -234,6 +234,20 @@ speciesmean_speciesstd
 ## #   ⁶​Sepal.Width_Std_dev, ⁷​Petal.Length_Std_dev, ⁸​Petal.Width_Std_dev
 ```
 
+#Develop a few novel questions for semester long project
+###Are children under the age of 5 ready for school? Compare pre-covid kids with covid kids now. ###Is baseball a dying sport? 
+###Was there interference in the 2020 presidential election? 
+###Has the repeal of Roe v Wade decreased abortions? 
+###How prevalant is human trafficking? What regions have the highest rates? What states? 
+###Are minority groups convicted at higher rates than whites? 
+###Is religion more prevalant now than it was 50 years ago? 
+###Do videogames (violent) play a role in the increase in school shootings?
+###Did the states with the strictest covid restrictions see lower rates of transmission? 
+
+
+
+
+
 #Develop a few novel questions that the data can answer
 ###Are there certain species of plant that grow larger than others? If so, what is the gap between the largest, and the smallest. 
 ###Are there more "small" than "large" species of flowers? (based on criteria provided)
