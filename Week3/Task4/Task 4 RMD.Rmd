@@ -1,0 +1,99 @@
+---
+title: "Task 2"
+author: "Hayden Armour"
+date: "9/4/2022"
+output:
+  html_document:
+    keep_md: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Installing and Loading Packages 
+```{r}
+library(knitr)
+library(tidyverse)
+```
+
+#Convert the iris data to a tibble called iris_data.
+```{r}
+iris_data <- as_tibble(iris)
+iris_data
+```
+
+#Arrange the iris data by Sepal.Length and display the first ten rows.
+```{r}
+a.sepal <- arrange(iris_data, Sepal.Length) 
+head(a.sepal, 10)
+```
+
+
+#Select the Species and Petal.Width columns and put them into a new data set called testdat.
+```{r}
+testdat <- select(iris_data, Species, Petal.Width)
+testdat
+```
+
+
+#Create a new table called species_mean that has the mean for each variable for each Species.
+```{r}
+species_mean <- iris_data %>%
+  group_by(Species) %>%
+  summarise(mean(Sepal.Length), mean(Sepal.Width), mean(Petal.Length), mean(Petal.Width)) 
+species_mean
+
+```
+
+
+#Create a data frame called iris_min with only the observations with at least 3 for Sepal.Width and not 2.5 for Petal.Width.
+```{r}
+select_iris <- select(iris_data, Species, Sepal.Width, Petal.Width, Sepal.Length, Petal.Length) 
+iris_min <-filter(select_iris, Sepal.Width >= 3, Petal.Width != 2.5)
+
+iris_min
+```
+
+#Create a data frame called iris_size with a column Sepal.Size which is
+```{r}
+iris_size <- iris_data %>%
+  mutate(Sepal.Size =
+           case_when(
+             Sepal.Length < 5 ~ "small",
+             Sepal.Length >= 5 & Sepal.Length < 6.5 ~ "medium",
+             Sepal.Length >= 6.5 ~ "large"))
+iris_size
+```
+
+#Create a data frame called iris_rank which ranks all of the data by Petal.Length, where a ranking of 1 is the largest Petal.Length and order by ranking.
+```{r}
+iris_ranking <- arrange(iris_data, desc(Petal.Length)) 
+iris_rank <- mutate(iris_ranking, rank=min_rank(Petal.Length))
+
+
+iris_rank
+```
+
+#Read about the ?summarize_all() function and get a new table with the means and standard deviations for each species.
+```{r}
+speciesmean_speciesstd <- iris_data %>%
+  group_by(Species) %>%
+  summarise_all(list(Mean=mean, Std_dev = sd)) 
+speciesmean_speciesstd
+```
+
+#Develop a few novel questions that the data can answer
+###Are there certain species of plant that grow larger than others? If so, what is the gap between the largest, and the smallest. 
+###Are there more "small" than "large" species of flowers? (based on criteria provided)
+###Is the greatest difference in Petal.Length means between setosa and versicolor, setosa and virginica, or versicolor and virginica? 
+###Which species has the highest standard deviation? Which has the smallest? 
+
+#Feedback summary 
+###Those that were asked to look at the questions beleived that these questions were novel, however, did not interest them. They did not know what a Sepal was, and weren't sure how these different measurements were measured. Once explained, and once ther results were given, they were not surprised by my findings. 
+
+
+
+
+
+
