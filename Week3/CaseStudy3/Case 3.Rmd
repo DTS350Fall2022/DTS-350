@@ -1,0 +1,67 @@
+---
+title: "Case 3"
+author: "Hayden Armour"
+date: "9/12/2022"
+output:
+  html_document:
+    keep_md: TRUE
+---
+```{r}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+#install.packages("gapminder")
+#Had to comment out to get it to knit 
+library(gapminder)
+head(gapminder)
+library(readr)
+library(tidyverse)
+library(knitr)
+library(downloader)
+library(dplyr)
+```
+
+
+```{r}
+gapminder_edit <- filter(gapminder, country != "Kuwait")
+head(gapminder_edit)
+```
+
+```{r}
+ggplot(data = gapminder_edit) +
+  geom_point(mapping = aes(size = pop/100000, x = lifeExp, y = gdpPercap, color = continent, group = year)) +
+  facet_wrap(~ year, nrow = 1) +
+  scale_y_continuous(trans = "sqrt") +
+  scale_size_continuous(name = "Population (100k)") +
+  xlab("Life Expectancy") +
+  ylab("GDP per capita") +
+  theme_bw()
+```
+
+```{r}
+
+weighted_GDP1 <- gapminder_edit 
+weighted_GDP2 <- group_by(weighted_GDP1, continent, year) 
+weighted_GDP <- summarise(weighted_GDP2, weightedGDP_percap = weighted.mean(gdpPercap), Population=pop/10000)
+```
+
+```{r}
+ggplot(data = gapminder_edit) +
+  geom_point(aes(x = year, y = gdpPercap, color = continent)) +
+  geom_line(aes(x = year, y = gdpPercap, color = continent, group = country)) +
+  geom_point(data=weighted_GDP,aes(x = year, y = weightedGDP_percap, size = Population)) +
+  geom_line(data=weighted_GDP,aes(x = year, y = weightedGDP_percap)) +
+  facet_wrap(~ continent, nrow = 1) +
+  xlab("Year") +
+  ylab("GDP per capita")  
+```
+
+
+
+
+
+
+
