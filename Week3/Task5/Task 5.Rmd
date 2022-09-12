@@ -1,0 +1,99 @@
+---
+title: "Task 5"
+author: "Hayden Armour"
+date: "9/4/2022"
+output:
+  html_document:
+    keep_md: TRUE
+    code_folding: 'hide'
+---
+
+```{r}
+library(tidyverse)
+library(knitr)
+library(downloader)
+```
+
+
+All data imported correctly as characters. All data imported was of charachter type
+```{r}
+SoloData <- read_csv("solo-artist-followers.csv")
+SoloData
+str(SoloData)
+```
+
+
+Data imported correctly - date type for date, charachter for titles, names, and bands. 
+```{r}
+BillboardData <- read_csv("billboard-hits.csv")
+str(BillboardData)
+head(BillboardData)
+```
+
+In BillboardData remove all singers who do not have at least 6 times they had a top 100 hit.
+```{r}
+sixtop100 <- BillboardData %>%
+  group_by(name) %>%
+  filter(n() > 6, band != "", !is.na(band))
+head(sixtop100)
+```
+Left me with 144 entries 
+
+```{r}
+sixtopbands <- BillboardData %>%
+  group_by(band) %>%
+  filter(band %in% sixtop100$band)
+head(sixtopbands)
+```
+
+```{r}
+ggplot(data = sixtop100, aes(x = peak_date, y = peak_rank, color = name, group = name)) +
+  geom_point() +
+  geom_line() +
+  geom_point(data = sixtopbands, color ="black") +
+  geom_line(data = sixtopbands, color = "black", linetype = "dotted") +
+  facet_wrap(~ band, scales = "free") +
+  xlab("peak_date") + ylab("peak_rank") +
+  theme_bw() 
+```
+Observations made:
+One Direction artists had different paths to success. ZAYN was mostly upwards while Harry Styles was all over the place
+None saw linear success - NSYNC had a lot of hits compared to Destiny's Child who had both lots of top 10 hits and lots of hits over 50 ranking
+None see prolonged success in terms of ranking - almost none have multiple songs back to back to back
+Destiny's Child had the most top 100 hits 
+Aventura had the least amount of top 100 hits. 
+
+
+https://www.kaggle.com/datasets/migeruj/videogames-predictive-model
+Info: includes platform, genre, publisher, North American sales, Europe sales, Japan sales, other sales, global sales, and rating
+```{r}
+videogames <- read_csv("videogamesales.csv")
+videogames
+str(videogames)
+```
+Are data types correct? 
+Yes - all character values 
+
+https://www.kaggle.com/datasets/dtrade84/us-state-life-expectancy-by-sex-2020
+Info: Life expecatnacy data broken down by state. Looks at different genders as well. 
+```{r}
+lifeexpectancy <- read_csv("life-expectancy.csv")
+lifeexpectancy
+str(lifeexpectancy)
+```
+Are the data types correct? 
+Yes - character values for what is needed (sex), and number values for where they are needed (life expectancy)
+
+
+https://github.com/owid/covid-19-data/tree/master/public/data
+Info: Covid data that includes location, date, total cases, new cases, reporduction, icu patients, hospital admissions and more
+```{r}
+coviddata <- read_csv("owid-covid-data.csv")
+coviddata
+str(coviddata)
+```
+Are the data types correct? 
+Yes. All numbers are labeled correctly, all words are labeled correctly 
+
+
+
