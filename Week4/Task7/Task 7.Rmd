@@ -1,0 +1,118 @@
+---
+title: "Task 7"
+author: "Hayden Armour"
+date: "9/15/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(readr)
+library(knitr)
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(downloader)
+```
+
+```{r}
+download.file("https://raw.githubusercontent.com/hadley/r4ds/master/data/heights.csv", "heights")
+```
+
+```{r}
+
+Height <- read_csv("heights")
+
+Height
+```
+
+```{r}
+
+HeightEd <- Height %>%
+  mutate(ed = as.factor(ed)) %>%
+  mutate(ed = fct_recode(ed,
+                         "primary" = "3",
+                         "primary" = "4",
+                         "primary" = "5",
+                         "primary" = "6",
+                         "secondary" = "7",
+                         "secondary" = "8",
+                         "secondary" = "9",
+                         "secondary" = "10",
+                         "secondary" = "11",
+                         "highschoolgrad" = "12",
+                         "associates" = "13",
+                         "associates" = "14",
+                         "associates" = "15",
+                         "bachelors" =  "16",
+                         "mastersdoctorate" = "17",
+                         "mastersdoctorate" = "18"))
+
+HeightEd
+```
+
+```{r}
+HeightEd1 <- HeightEd %>%
+  group_by(race) %>%
+  count(ed) 
+
+HeightEd1
+```
+
+
+
+```{r}
+edrace <- ggplot(data = HeightEd1, aes(x = ed, y = n, fill = race)) +
+  geom_bar(stat = "identity", position = "dodge")
+
+
+edrace
+
+
+```
+
+```{r}
+HeightEd2 <- HeightEd %>%
+  group_by(sex) %>%
+  count(ed) 
+
+HeightEd2
+```
+
+
+
+```{r}
+edsex <- ggplot(data = HeightEd2, aes(x = ed, y = n, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge")
+
+edsex
+```
+
+
+```{r}
+meanearn <- HeightEd %>%
+  group_by(sex) %>%
+  mean(earn)
+
+meanearn <- HeightEd %>%
+  group_by(sex) %>%
+  summarise(averageearn = mean(earn))
+
+meanearn
+
+
+extra <- ggplot(data = meanearn, aes(x = sex, y = averageearn, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Sex", y = "Average Earning (in $)", title = "Average Earnings by Sex", subtitle = "Males Earn More") 
+
+
+extra
+```
+
+From this graph, it is very easy to tell that men get paid more, on average, than women do. Of course there will be women who make more than some men, but, in general, we can say that men make more than women. We could delve further into the analysis, and see the breakdown of male vs female by race and the earnings they make if we wanted to as well. 
