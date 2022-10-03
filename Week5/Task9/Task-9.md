@@ -75,7 +75,7 @@ Does Length have an effect on Dosage?
 
 ```r
 plot2 <- ggplot(data = ToothGrowth) +
-  geom_point(data = ToothGrowth, mapping = aes(y = dose, x = len, color = dose, shape = supp)) +
+  geom_jitter(data = ToothGrowth, mapping = aes(y = dose, x = len, color = dose, shape = supp)) +
   theme_minimal() +
   labs(y = 'Dosage', x = 'Length', title = 'Does Length have an Effect on Dosage?', tag = "Plot 2") 
   
