@@ -89,7 +89,7 @@ Nothing was suprising. We can see that both cut and clarity have an effect on th
 
 Can you determine what variable in the diamonds dataset is most important for predicting the price of a diamond? How is that variable correlated with cut? Why does the combination of those two relationships lead to lower quality diamonds being more expensive?
 
-It is hard to determine what exactly is the most important variable - however, we can say that clarity and cut both have an effect. However, I would say 
+It is hard to determine what exactly is the most important variable - however, we can say that clarity and cut both have an effect. However, I would say that carat has the largest effect on price, followed by clarity and then cut. Quality of the diamond is important, however, the size still contributes more to the price than the cut or clarity does. 
 
 
 
