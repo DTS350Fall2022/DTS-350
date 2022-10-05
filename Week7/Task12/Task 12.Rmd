@@ -1,0 +1,175 @@
+---
+title: "Task 12"
+author: "Hayden Armour"
+date: "10/4/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr) 
+library(haven)
+library(readxl)
+library(ggplot2)
+library(knitr)
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(corrplot)
+library(downloader)
+library(readr)
+```
+
+```{r}
+data1rds <- tempfile()
+
+download.file("https://github.com/WJC-Data-Science/DTS350/raw/master/Dart_Expert_Dow_6month_anova/Dart_Expert_Dow_6month_anova.RDS", data1rds)
+
+data1 <- read_rds(data1rds)
+
+str(data1)
+head(data1)
+
+data2 <- read_csv(url("https://github.com/WJC-Data-Science/DTS350/raw/master/Dart_Expert_Dow_6month_anova/Dart_Expert_Dow_6month_anova.csv"))
+
+head(data2)
+
+data3 <- read_dta(url("https://github.com/WJC-Data-Science/DTS350/raw/master/Dart_Expert_Dow_6month_anova/Dart_Expert_Dow_6month_anova.dta"))
+
+head(data3)
+
+
+data4 <- read_sav(url("https://github.com/WJC-Data-Science/DTS350/raw/master/Dart_Expert_Dow_6month_anova/Dart_Expert_Dow_6month_anova.sav"))
+
+head(data4)
+
+
+datatemp5 <- tempfile()
+
+download.file("https://github.com/WJC-Data-Science/DTS350/raw/master/Dart_Expert_Dow_6month_anova/Dart_Expert_Dow_6month_anova.xlsx", datatemp5)
+
+data5 <- read_xlsx(datatemp5)
+
+head(data5)
+```
+
+Check that all five files you have imported into R are in fact the same with all_equal()
+```{r}
+all_equal(data1, data2, data3, convert = TRUE)
+all_equal(data1, data4, data5, convert = TRUE)
+```
+
+Use one of the files to make a graphic showing the performance of the Dart, DJIA, and Pro stock selections.
+Include a boxplot, the jittered returns, and the average return in your graphic
+
+Boxplot
+```{r}
+plot1 <- ggplot(data = data2, mapping = aes(x = variable, y = value, fill = variable)) +
+  geom_boxplot() +
+  labs(x = "Variable", y = "Value", title = "Boxplot That Includes the Values for Each Variable")
+
+plot1
+```
+This boxplot looks at the values for each variable; DARTS, DIJA, and PROS. PROS is the most variable, followed by DARTS, and DIJA has the least variation. 
+
+
+Jitter Plot
+```{r}
+plot2 <- ggplot(data = data2, mapping = aes(x = variable, y = value, color = variable)) +
+  geom_jitter() +
+  labs(x = "Variable", y = "Value", title = "Jitter Plot That Includes the Values for Each Variable")
+
+plot2
+```
+From this jitterplot, we can see that once again, PROS is the most variable, followed by DARTS and then DIJA. DIJA's data points are more condensed than the others. 
+
+Line Graph, facet wrapped by variable name
+```{r}
+plot3 <- ggplot(data = data2, mapping = aes(x = contest_period, y = value, color = variable, group = variable)) +
+  geom_line() +
+  facet_wrap(~ variable) +
+  labs(x = "Variable", y = "Value", title = "Line Graph That Includes the Values for Each Variable")
+
+plot3
+```
+From the line graph, we can see that DIJA is the most variable. DARTS has the lowest point out of all three variables while PROS has the highest. 
+
+Create a table using code of the DJIA returns that matches the table shown below (“spread” the data).
+```{r}
+finaltable <- data2 %>%
+  filter(variable == 'DJIA') %>%
+  mutate(contest_period = str_replace_all(contest_period, '19', '_19'),
+         contest_period = str_replace(contest_period, 'Febuary', 'February'),
+         contest_period = str_replace(contest_period, 'Dec._1993', 'December_1993')) %>%
+  separate(contest_period, into = c("Month", "year_end"), sep = '-') %>%
+  separate(year_end, into = c("Month", "year"), sep = '_') %>%
+  pivot_wider(names_from = "year", values_from = "value") %>%
+  arrange(factor(Month, levels = month.name)) %>%
+  select(-variable)
+
+head(finaltable)
+```
+
+
+Save your “tidy” data as an .rds object.
+```{r}
+saveRDS(finaltable, file = "finaltable.rsd")
+```
+
+```{r}
+finaldata <- finaltable %>%
+  pivot_longer(2:10, names_to = "year", values_to = "return", values_drop_na = TRUE) 
+
+print(finaldata, n = 100)
+```
+
+
+
+Create a plot that shows the six-month returns by the year in which the returns are collected.
+```{r}
+
+plot4 <- ggplot(data = finaldata, aes(x = year, y = return, group = Month)) +
+    geom_point(aes(color = Month)) +
+    geom_line(aes(color = Month)) +
+    facet_wrap(~Month) +
+    labs(x = 'Year', y = 'Return' , title = 'Returns by Month and Year')
+
+plot4
+```
+From this line graph, we can see each individual month of year, and see how it is correlated throughout the years. There is lots of variation in most of these graphs, but September, April and August all seem to have the biggest changes. Warmer months seem to have the most variation. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
