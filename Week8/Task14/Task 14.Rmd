@@ -1,0 +1,211 @@
+---
+title: "Task 14"
+author: "Hayden Armour"
+date: "10/17/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr)
+library(tidyverse)
+library(downloader)
+library(corrplot)
+library(stringi)
+```
+
+```{r}
+download.file("https://github.com/WJC-Data-Science/DTS350/raw/master/bible.csv", "bible")
+```
+
+```{r}
+bible <- read.csv("bible")
+
+tail(bible)
+head(bible)
+```
+
+What is the average verse length (number of words) in the Old Testament compared to the New Testament?
+
+Data filtered to include only the old testament 
+```{r}
+oldtestament <- bible %>%
+  filter(volume_title == "Old Testament") %>%
+  select(scripture_text)
+
+head(oldtestament)
+```
+
+Data filtered to include only the new testament 
+```{r}
+newtestament <- bible %>%
+  filter(volume_title == "New Testament") %>%
+  select(scripture_text)
+
+head(newtestament)
+```
+
+Function that can be used to find verse length 
+```{r}
+average_verse_length <- vector("integer", nrow(newtestament))
+
+for (i in seq(1,nrow(newtestament))) {average_verse_length[[i]] <- stri_stats_latex(newtestament$scripture_text[i]) [[4]]
+}
+
+mean(average_verse_length)
+
+```
+The average verse length in the oldtestament is 26.42074
+The average in the newtestament is 22.70517 
+
+
+How often is the word LORD (case insensitive) in the Old Testament compared to the New Testament?
+```{r}
+
+str_count(oldtestament, "(?i)lord")
+
+str_count(newtestament, "(?i)lord")
+
+```
+(?i) = case insensitive modifier 
+str_count finds how often lord is repeated
+
+Lord appears in the Old Testament 7,273 times
+Lord appears in the New Testament 736 times
+
+
+Visualization
+How does the word count distribution by verse look for each book in the New Testament?
+```{r}
+newtestament1 <- bible %>%
+  filter(volume_title == "New Testament") %>%
+  select(scripture_text, book_title, verse_number)
+
+head(newtestament1)
+```
+
+
+```{r}
+average_verse_lengthgraph <- vector("integer", nrow(newtestament1))
+
+for (i in seq(1,nrow(newtestament1))) {average_verse_lengthgraph[[i]] <- stri_stats_latex(newtestament1$scripture_text[i]) [[4]]
+}
+
+average_verse_lengthgraph
+```
+
+
+```{r}
+new_avg_length <- bind_cols(newtestament1, average_verse_lengthgraph) %>%
+  mutate(word_count = ...4) %>%
+  select(book_title, verse_number, word_count)
+ 
+head(new_avg_length)
+```
+
+
+```{r}
+ggplot(data = new_avg_length, mapping = aes(x = word_count)) +
+  geom_histogram(color = "black", fill = "white") +
+  theme_dark() +
+  labs(title = "Word Count Distribution by Verse", subtitle = "For Each Book in the New Testament",
+       x = "Word Count Distribution", y = "Count") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5)) 
+  #stat_bin(geom = "text", aes(label = ..count..), vjust = 1.5, size = 2.5)
+```
+
+
+```{r}
+plot1 <- ggplot(data = new_avg_length, mapping = aes(y = word_count, x = verse_number, fill = book_title)) +
+  geom_col() +
+  facet_wrap(~book_title) +
+  labs(title = "Word Count Distribution by Verse", subtitle = "For Each Book in the New Testament",
+       x = "Word Count Distribution", y = "Count") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5)) 
+
+plot1
+```
+
+
+```{r}
+plot2 <- ggplot(data = new_avg_length, mapping = aes(x = word_count, fill = book_title)) +
+  geom_bar(color = 'black') +
+  labs(title = "Word Count Distribution by Verse", subtitle = "For Each Book in the New Testament",
+       x = "Word Count Distribution", y = "Count") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5)) 
+
+plot2
+```
+
+
+```{r}
+plot3 <- ggplot(data = new_avg_length, mapping = aes(x = word_count, y = verse_number, color = book_title)) +
+  geom_point() +
+  labs(title = "Word Count Distribution by Verse", subtitle = "For Each Book in the New Testament",
+       x = "Word Count Distribution", y = "Count") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5)) 
+
+plot3
+```
+
+
+```{r}
+plot4 <- ggplot(data = new_avg_length, mapping = aes(x = word_count, y = verse_number, color = book_title)) +
+  geom_point() +
+  facet_wrap(~book_title) +
+  labs(title = "Word Count Distribution by Verse", subtitle = "For Each Book in the New Testament",
+       x = "Word Count Distribution", y = "Count") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5)) 
+
+plot4
+```
+
+
+```{r}
+plot5 <- ggplot(data = new_avg_length, mapping = aes(x = word_count, fill = book_title)) +
+  geom_histogram() +
+  labs(title = "Word Count Distribution by Verse", subtitle = "For Each Book in the New Testament",
+       x = "Word Count Distribution", y = "Count") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5)) 
+
+plot5
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
