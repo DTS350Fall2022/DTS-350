@@ -60,7 +60,7 @@ sales_hour <- newcarwash %>%
   group_by(hour) %>%
   summarise(across(amount, sum))
 
-sales_hour
+head(sales_hour)
 ```
 
 
@@ -88,7 +88,7 @@ hour_var_match <- weather_match %>%
   select(hour, tmpf)
 
 
-hour_var_match
+head(hour_var_match)
 ```
 
 Merge the two datasets together

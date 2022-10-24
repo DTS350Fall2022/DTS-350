@@ -277,21 +277,16 @@ head(newcarwash)</code></pre>
   group_by(hour) %&gt;%
   summarise(across(amount, sum))
 
-sales_hour</code></pre>
-<pre><code>## # A tibble: 240 × 2
-##    hour                amount
-##    &lt;dttm&gt;               &lt;dbl&gt;
-##  1 2016-05-13 15:00:00    1  
-##  2 2016-05-16 09:00:00   -1  
-##  3 2016-05-16 12:00:00   66.0
-##  4 2016-05-16 14:00:00   23.6
-##  5 2016-05-16 16:00:00  127. 
-##  6 2016-05-17 10:00:00    5  
-##  7 2016-05-17 11:00:00   20  
-##  8 2016-05-17 12:00:00   25  
-##  9 2016-05-17 13:00:00   60  
-## 10 2016-05-17 14:00:00  110  
-## # … with 230 more rows</code></pre>
+head(sales_hour)</code></pre>
+<pre><code>## # A tibble: 6 × 2
+##   hour                amount
+##   &lt;dttm&gt;               &lt;dbl&gt;
+## 1 2016-05-13 15:00:00    1  
+## 2 2016-05-16 09:00:00   -1  
+## 3 2016-05-16 12:00:00   66.0
+## 4 2016-05-16 14:00:00   23.6
+## 5 2016-05-16 16:00:00  127. 
+## 6 2016-05-17 10:00:00    5</code></pre>
 <p>Use riem_measures(station = “RXE”, date_start = , date_end = ) for station RXE from library(riem) to get the matching temperatures.</p>
 <pre class="r"><code>#head(pos_carwash)
 #tail(pos_carwash)
@@ -325,21 +320,16 @@ head(weather_match)</code></pre>
   select(hour, tmpf)
 
 
-hour_var_match</code></pre>
-<pre><code>## # A tibble: 1,419 × 2
-##    hour                 tmpf
-##    &lt;dttm&gt;              &lt;dbl&gt;
-##  1 2016-05-12 19:00:00  68  
-##  2 2016-05-12 20:00:00  66.0
-##  3 2016-05-12 21:00:00  63.0
-##  4 2016-05-12 22:00:00  59  
-##  5 2016-05-12 23:00:00  57.9
-##  6 2016-05-13 00:00:00  55.0
-##  7 2016-05-13 01:00:00  55.0
-##  8 2016-05-13 02:00:00  48.0
-##  9 2016-05-13 03:00:00  45.0
-## 10 2016-05-13 04:00:00  46.0
-## # … with 1,409 more rows</code></pre>
+head(hour_var_match)</code></pre>
+<pre><code>## # A tibble: 6 × 2
+##   hour                 tmpf
+##   &lt;dttm&gt;              &lt;dbl&gt;
+## 1 2016-05-12 19:00:00  68  
+## 2 2016-05-12 20:00:00  66.0
+## 3 2016-05-12 21:00:00  63.0
+## 4 2016-05-12 22:00:00  59  
+## 5 2016-05-12 23:00:00  57.9
+## 6 2016-05-13 00:00:00  55.0</code></pre>
 <p>Merge the two datasets together</p>
 <pre class="r"><code>combined &lt;- merge(hour_var_match, sales_hour, by = &quot;hour&quot;) %&gt;%
   arrange(hour) %&gt;%
