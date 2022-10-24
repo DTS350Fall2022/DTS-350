@@ -1,0 +1,120 @@
+---
+title: "Case 8"
+author: "Hayden Armour"
+date: "10/24/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr)
+library(tidyverse)
+library(downloader)
+library(corrplot)
+library(stringi)
+library(lubridate)
+library(riem)
+```
+
+```{r}
+tempsales <- tempfile()
+
+download("https://github.com/WJC-Data-Science/DTS350/raw/master/sales.csv", tempsales, mode = "wb")
+
+sales <- read_csv(tempsales)
+
+head(sales)
+```
+
+The data are for businesses in the mountain time zone. Make sure you read in times correctly.
+```{r}
+salestz <- with_tz(sales, tzone = "US/Mountain")
+
+head(salestz)
+
+tail(salestz)
+```
+
+This is point of sale (pos) data, so you will need to use library(lubridate) to create the correct time aggregations.
+```{r}
+
+timedata <- salestz %>%
+  mutate(hourofday = hour(Time)) %>%
+  mutate(dayofweek = wday(Time, label = TRUE, abbr = FALSE)) %>%
+  mutate(weekofyear = week(Time)) %>%
+  mutate(monthofyear = month(Time)) 
+
+tail(timedata)
+```
+
+
+Help your boss understand which business is the best investment through visualizations.
+
+Provide an understanding and recommendation for hours of operation.
+```{r}
+hourofoperation <- timedata %>%
+  group_by(Name, hourofday) %>%
+  select(Name, Amount, hourofday)
+
+head(hourofoperation)
+
+ggplot(data = hourofoperation, mapping = aes(x = hourofday, y = Amount)) +
+  geom_col() +
+  labs(title = "Recommended Hours of Operation", subtitle = "Broken Down by Sales by their Respective Hours", x = "Hour of the Day", y = "Amount of Sales (+/-) in $") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5))
+```
+
+We can see here, that the optimal hours of operation would be from 9am-8pm. There are some hour-intervals included that go below the x-axis, but it is negated by the height on the y. They ultimately make money, but incur some sort of costs along the way. 
+
+Customer traffic is greatest between the hours of 11am and 2pm. It is virtually none between the hours of 12am and 7 am, and sees more traffic between 8am and 11pm. 
+
+
+
+Provide a final comparison of the six companies and a final recommendation.
+```{r}
+
+ex <- hourofoperation %>% filter(Name != "Missing")
+tail(ex)
+
+ggplot(data = ex, mapping = aes(x = hourofday, y = Amount)) +
+  geom_col() +
+  facet_wrap(~Name) +
+  labs(title = "Recomended Hours of Operation", subtitle = "Broken Down by Sales by their Respective Hours", x = "Hour of the Day", y = "Amount of Sales (+/-) in $") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5))
+```
+
+Here, we can see that HotDiggity overall has the most sales while Frozone has the least.
+All follow the same trend with regards to hours of operation - they should operate between the hours of 9am-8pm. 
+There is slight variation... LeBelle and Tacontento should stay open later, say until 10 or 11 pm, and SplashandDash should close earlier, say around 5pm. 
+All companies have periods during the day where the fall below the x-axis, however, with the exception of ShortStop at 4pm, they are all negated by larger profits than costs. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
