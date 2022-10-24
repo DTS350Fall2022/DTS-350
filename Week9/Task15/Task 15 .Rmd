@@ -1,0 +1,144 @@
+---
+title: "Task 15"
+author: "Hayden Armour"
+date: "10/24/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr)
+library(tidyverse)
+library(downloader)
+library(corrplot)
+library(stringi)
+library(lubridate)
+library(riem)
+```
+
+```{r}
+tempcarwash <- tempfile()
+
+download("https://github.com/WJC-Data-Science/DTS350/raw/master/carwash.csv", tempcarwash, mode = "wb")
+
+carwash <- read_csv(tempcarwash)
+
+head(carwash)
+
+str(carwash)
+```
+
+Convert the times from UTC time to mountain time 
+```{r}
+
+carwash_tz <- with_tz(carwash, tzone = "US/Mountain")
+
+head(carwash_tz)
+```
+
+Create a new hourly grouping variable using ceiling_date()
+```{r}
+newcarwash <- carwash_tz %>%
+  mutate(hour = ceiling_date(time, "hour"))
+
+head(newcarwash)
+```
+
+Aggregate the point of sale data into hour sales totals.
+```{r Aggregated}
+
+head(carwash_tz)
+
+sales_hour <- newcarwash %>%
+  group_by(hour) %>%
+  summarise(across(amount, sum))
+
+sales_hour
+```
+
+
+Use riem_measures(station = "RXE",  date_start  = ,  date_end  =  ) for station RXE from library(riem) to get the matching temperatures.
+```{r Matching Temperatures}
+#head(pos_carwash)
+#tail(pos_carwash)
+
+weather_match <- riem_measures(station = "RXE",  date_start ="2016-05-13" ,  date_end  ="2016-07-08") %>%
+  with_tz(tzone = "US/Mountain") %>%
+  drop_na(tmpf) %>%
+  mutate(hour = ceiling_date(valid, "hour"))
+
+
+head(weather_match)
+
+```
+
+
+Create a new hourly variable that matches your car wash hourly variable.
+```{r New Variable and Omit NA}
+hour_var_match <- weather_match %>%
+  with_tz(tzone = "US/Mountain") %>%
+  filter(tmpf != "") %>%
+  select(hour, tmpf)
+
+
+hour_var_match
+```
+
+Merge the two datasets together
+```{r}
+combined <- merge(hour_var_match, sales_hour, by = "hour") %>%
+  arrange(hour) %>%
+  mutate(newhour = hour(hour)) %>%
+  group_by(newhour)
+
+
+head(combined)
+```
+
+Graph that looks at sales by day/hour
+```{r}
+hoursales <- ggplot(data = combined, mapping = aes(x = tmpf, y = amount)) +
+  geom_col() +
+  labs(title = "Relationship of Sales and Temperature", subtitle = "Grouped by Hour of the Day (Military/24 Time)", x = "Temperature", y = "Sales") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5))
+  
+hoursales
+
+```
+
+We can see, that when temperatures at the extremes (hottest vs coldest) that there are less sales, less people using the carwash than when the temprature is moderate. Temps between 70 and 80 yield the highest sales, and those below 55 yield the lowest. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
