@@ -1,0 +1,174 @@
+---
+title: "Task 17"
+author: "Hayden Armour"
+date: "10/31/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+library(readr)
+library(knitr)
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(downloader)
+library(corrplot)
+library(tidyquant)
+library(timetk)
+library(dygraphs)
+```
+
+Stocks that my friend chose: AAPL, GOOG, and AMZN 
+
+Stocks that I chose: MSFT, TSLA, JNJ 
+
+```{r}
+(Apple <- tq_get("AAPL", get = "stock.prices"))
+
+(Google <- tq_get("GOOG", get = "stock.prices"))
+
+(Amazon <- tq_get("AMZN", get = "stock.prices"))
+
+(Microsoft <- tq_get("MSFT", get = "stock.prices"))
+
+(Tesla <- tq_get("TSLA", get = "stock.prices"))
+
+(JNJ <- tq_get("JNJ", get = "stock.prices"))
+```
+
+Friends stock prices
+```{r}
+friend <- tq_get(c("AAPL", "GOOG", "AMZN"), get = "stock.prices", from = "2021-10-01", to = today())
+
+head(friend)
+tail(friend)
+```
+
+My stock prices 
+```{r}
+mine <- tq_get(c("MSFT", "TSLA", "JNJ"), get = "stock.prices", from = "2021-10-01", to = today())
+head(mine)
+
+head(mine)
+tail(mine)
+```
+
+Combining datasets 
+```{r}
+combined <- tq_get(c("AAPL", "GOOG", "AMZN","MSFT", "TSLA", "JNJ"), get = "stock.prices", from = "2021-10-01", to = today())
+
+head(combined)
+tail(combined)
+```
+
+Who is winning each day? 
+```{r}
+stockprices <- ggplot(data = combined, mapping = aes(x = date, y = close, color = symbol)) +
+  geom_line()
+```
+
+Difference in open and close each day
+```{r}
+openclose <- combined %>%
+  select(symbol, open, close, date) %>%
+  mutate(difference = open - close)
+
+head(openclose)
+```
+
+
+```{r}
+stockpricedifference <- ggplot(data = openclose, mapping = aes(x = date, y = difference, color = symbol)) +
+  geom_line()
+
+stockpricedifference
+```
+
+Same graph as above, but removed TSLA due to extreme variation
+```{r}
+notsla <- combined %>%
+  select(symbol, open, close, date) %>%
+  filter(symbol != "TSLA") %>% 
+  mutate(difference = open - close)
+
+head(notsla)
+
+
+notslagraph <- ggplot(data = notsla, mapping = aes(x = date, y = difference, color = symbol)) +
+  geom_line()
+
+notslagraph
+```
+
+
+```{r}
+stockpriceadjusted <- combined %>%
+  select(symbol, date, adjusted) %>%
+  pivot_wider(names_from = symbol, values_from = adjusted) %>%
+  tk_xts(date_var = date)
+
+head(stockpriceadjusted)
+```
+
+Interactive graph that shows the percent change over time
+```{r}
+dygraph(stockpriceadjusted, main = "Straw Broom Chart Percent") %>%
+  dyRebase(percent = TRUE) %>%
+  dyShading(from = "2021-10-01", to = today()) %>%
+  dyRangeSelector()
+```
+
+From these graphs, we can see, that typically, Tesla performs the best, followed by Apple. 
+Amazon performs the worst, and Johnson and Johnson, Google, and Microsoft fall in the middle with little variation (depending on why you are investing, these stocks might be the best because they do not take drastic leaps or falls)
+
+Interactive graph that shows prices over time 
+```{r}
+dygraph(stockpriceadjusted, main = "Straw Broom Chart") %>%
+  dyRebase(value = 1000) %>% 
+  dyAnnotation("2021-10-01", text = "A") %>%
+  dyShading(from = "2021-10-01", to = today()) %>%
+  dyRangeSelector()
+```
+
+The same things are portrayed here as above. 
+
+I chose these stocks because they are fairly common stock to invest in that typically don't see much variation (they are low risk stocks to invest in).
+
+Overall, I would say that my stocks won the competition. I chose Tesla, which performed the best, and my friend chose Amazon, who performed the worst. My other two stocks, Microsoft and Johnson and Johnson (who performed 3rd best), performed better than my friends other stocks. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
