@@ -108,76 +108,76 @@ Section 2
 
 Set up to build the graphs when given tickers
 ```{r}
-#tickersupdated <- tq_get(c(), get = "stock.prices", from = today()-years(5), to = today())
+tickersupdated <- tq_get(c("QQQ", "MO", "KO", "ABB", "LH", "CINF"), get = "stock.prices", from = today()-years(5), to = today())
 
-#head(tickersupdated)
+head(tickersupdated)
 ```
 
 ```{r}
-#fiveyearadjustednew <- tickersupdated %>%
- #select(symbol, date, adjusted) %>%
-  #pivot_wider(names_from = symbol, values_from = adjusted) %>%
- # tk_xts(date_var = date)
+fiveyearadjustednew <- tickersupdated %>%
+ select(symbol, date, adjusted) %>%
+  pivot_wider(names_from = symbol, values_from = adjusted) %>%
+  tk_xts(date_var = date)
 
 
-#head(fiveyearadjustednew)
+head(fiveyearadjustednew)
 ```
 
 
 ```{r}
-#dygraph(fiveyearadjustednew, main = "Straw Broom Chart Percent") %>%
-  #dyRebase(percent = TRUE) %>%
- # dyShading(from = today()-years(5), to = today()) %>%
- # dyRangeSelector()
+dygraph(fiveyearadjustednew, main = "Straw Broom Chart Percent") %>%
+  dyRebase(percent = TRUE) %>%
+  dyShading(from = today()-years(5), to = today()) %>%
+  dyRangeSelector()
 ```
 
 Graph 2
 ```{r}
-#dygraph(fiveyearadjustednew, main = "Stock Price Comparison") %>%
- # dyHighlight(highlightCircleSize = 2, 
-  #            highlightSeriesBackgroundAlpha = 0.2,
-   #           hideOnMouseOut = FALSE) %>% 
-  #dyOptions(axisLineColor = "red",
-   #         gridLineColor = "lightblue") %>% 
-  #dyRangeSelector(dateWindow = c(today()-years(5),today())) 
+dygraph(fiveyearadjustednew, main = "Stock Price Comparison") %>%
+  dyHighlight(highlightCircleSize = 2, 
+              highlightSeriesBackgroundAlpha = 0.2,
+              hideOnMouseOut = FALSE) %>% 
+  dyOptions(axisLineColor = "red",
+            gridLineColor = "lightblue") %>% 
+  dyRangeSelector(dateWindow = c(today()-years(5),today())) 
 ```
 
 
 Set up for graph below
 ```{r}
-#fiveyearvolumenew <- tickersupdated %>%
-  #select(symbol, date, volume)
+fiveyearvolumenew <- tickersupdated %>%
+  select(symbol, date, volume)
 
-#head(fiveyearvolumenew)
+head(fiveyearvolumenew)
 ```
 
 Graph that shows the volume of each different stock 
 ```{r}
-#plotvolumenew <- ggplot(data = fiveyearvolumenew, mapping = aes(x = date, y = volume, color = #symbol)) +
- # geom_line() +
-  #facet_wrap(~symbol)
+plotvolumenew <- ggplot(data = fiveyearvolumenew, mapping = aes(x = date, y = volume, color = symbol)) +
+  geom_line() +
+  facet_wrap(~symbol)
 
-#plotvolumenew
+plotvolumenew
 ```
 
 Interactive graph that shows the stocks and their prices over the last 5 years 
 ```{r}
-#tickersinteractivenew <- tickersupdated %>%
-  #select(symbol, date, adjusted) %>%
- # pivot_wider(names_from = symbol, values_from = adjusted) %>%
- # tk_xts(date_var = date)
+tickersinteractivenew <- tickersupdated %>%
+  select(symbol, date, adjusted) %>%
+  pivot_wider(names_from = symbol, values_from = adjusted) %>%
+  tk_xts(date_var = date)
 
-#dygraph(tickersinteractivenew)
+dygraph(tickersinteractivenew)
 ```
 
 Interactive graph that shows volume 
 ```{r}
-#tickersinteractive2new <- tickersupdated %>%
-  #select(symbol, date, volume) %>%
- # pivot_wider(names_from = symbol, values_from = volume) %>%
- # tk_xts(date_var = date)
+tickersinteractive2new <- tickersupdated %>%
+  select(symbol, date, volume) %>%
+  pivot_wider(names_from = symbol, values_from = volume) %>%
+  tk_xts(date_var = date)
 
-#dygraph(tickersinteractive2new)
+dygraph(tickersinteractive2new)
 ```
 
 
