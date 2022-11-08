@@ -1,0 +1,177 @@
+---
+title: "Task 18"
+author: "Hayden Armour"
+date: "11/7/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(remotes)
+
+library(sf)
+
+library(maps)
+
+library(USAboundariesData)
+
+library(USAboundaries)
+
+#install.packages("ggrepel")
+library(ggrepel)
+#geom_label_repel()
+
+library(ggplot2)
+library(readr)
+library(knitr)
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(downloader)
+library(corrplot)
+library(tidyquant)
+library(timetk)
+library(dygraphs)
+```
+
+Create dataframe for the cities data
+```{r}
+cities <- us_cities() 
+  
+head(cities)
+```
+
+Create dataframe for the states data
+```{r}
+states <- us_states()
+
+head(states)
+```
+
+Create dataframe for the county data
+```{r}
+county <- us_counties()
+
+head(county)
+```
+
+Gets the county data for Idaho 
+```{r}
+idahocounties <- us_counties(states = "ID")
+```
+
+Create the dataframe with the state name and the geometry (the longitutde and latitude)
+```{r}
+statesmap <- sf::st_as_sf(map("state", plot = FALSE, fill = TRUE))
+
+head(statesmap)
+```
+
+Filter out Alaska and Hawaii since they are not included in the map we are recreating 
+```{r}
+filteredcities <- cities %>%
+  filter(state_name != 'Alaska', state_name != 'Hawaii')
+```
+
+Group the new dataset by state, and since we are looking for the 3 largest cities, we will arrange them by population from greatest to least
+```{r}
+top3cities <- filteredcities %>%
+  group_by(state_name) %>%
+  arrange(desc(population))
+
+head(top3cities)
+```
+
+Take the top 3 largest population cities in each state 
+```{r}
+threelargestcities <- top3cities %>%
+  slice(1:3)
+
+head(threelargestcities)
+```
+
+Create datasets that hold the largest, the middle, and the smallest populations for each state in the U.S.
+```{r}
+largest <- threelargestcities %>%
+  slice(1:1)
+middle <- threelargestcities %>%
+  slice(2:2)
+smallest <- threelargestcities %>%
+  slice(3:3)
+
+head(largest)
+```
+
+Create the graphic that we were supposed to recreate
+```{r}
+
+
+ggplot() +
+  geom_sf(data = statesmap, fill = NA) +
+  geom_sf(data = idahocounties, fill = NA) +
+  geom_sf(data = smallest, aes(size = population/1000), color = "lightblue") +
+  geom_sf(data = middle, aes(size = population/1000), color = "royalblue1") +
+  geom_sf(data = largest, aes(size = population/1000), color = "royalblue4") +
+  geom_sf_label(data = largest, aes(label = city), color = "darkblue", nudge_x = 1.5, nudge_y = 1, size = 2) +
+  scale_size_continuous(name = 'Population\n(1,000)') +
+  labs(title="3 Largest Cities (by Population) Per State", x="Latitude",y="Longitude") +
+  theme_bw()
+```
+Could not figure out how to get geom_label_repel to space the labels out better
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
