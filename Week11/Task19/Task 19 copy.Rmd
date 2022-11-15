@@ -1,0 +1,131 @@
+---
+title: "Task 19"
+author: "Hayden Armour"
+date: "11/14/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load in libraries 
+```{r}
+library(tidyverse)
+library(maps)
+library(USAboundaries)
+library(leaflet)
+```
+
+
+```{r}
+statesmap <- sf::st_as_sf(map("state", plot = FALSE, fill = TRUE))
+```
+
+Create dataframe for the cities data
+```{r}
+cities <- us_cities() 
+  
+head(cities)
+```
+
+Create dataframe for the states data
+```{r}
+states <- us_states()
+
+head(states)
+```
+
+Create dataframe for the county data
+```{r}
+county <- us_counties()
+
+head(county)
+```
+
+Gets the county data for Idaho 
+```{r}
+idahocounties <- us_counties(states = "ID")
+```
+
+
+Filter out Alaska and Hawaii since they are not included in the map we are recreating 
+```{r}
+filteredcities <- cities %>%
+  filter(state_name != 'Alaska', state_name != 'Hawaii')
+```
+
+Group the new dataset by state, and since we are looking for the 3 largest cities, we will arrange them by population from greatest to least
+```{r}
+top3cities <- filteredcities %>%
+  group_by(state_name) %>%
+  arrange(desc(population))
+
+head(top3cities)
+```
+
+Take the top 3 largest population cities in each state 
+```{r}
+threelargestcities <- top3cities %>%
+  slice(1:3)
+
+head(threelargestcities)
+```
+
+Create datasets that hold the largest, the middle, and the smallest populations for each state in the U.S.
+```{r}
+largest <- threelargestcities %>%
+  slice(1:1)
+middle <- threelargestcities %>%
+  slice(2:2)
+smallest <- threelargestcities %>%
+  slice(3:3)
+
+head(largest)
+
+largestcity <- largest %>%
+  select(city)
+```
+
+
+```{r}
+plot1 <- leaflet() %>% 
+  addTiles() %>%
+  addPolygons(data = statesmap, fillColor = 'white', weight = 1, color = 'grey') %>%
+  addPolygons(data = idahocounties, fillColor = 'white', , weight = 1, color = 'grey') %>%
+  addCircleMarkers(data = smallest, radius = 1, color = 'skyblue', opacity = 1) %>%
+  addCircleMarkers(data = middle, radius = 2, color = 'blue', opacity = 1) %>%
+  addCircleMarkers(data = largest, radius = 5, color = 'navy', opacity = 1) %>%
+  addCircleMarkers(data = largestcity, label = ~city)
+
+  
+  
+
+plot1
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
