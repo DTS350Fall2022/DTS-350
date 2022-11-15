@@ -1,0 +1,181 @@
+---
+title: "Case 10"
+author: "Hayden Armour"
+date: "11/7/2022"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(readr)
+library(knitr)
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(downloader)
+library(corrplot)
+library(tidyquant)
+library(USAboundaries)
+library(stringr)
+library(plotly)
+library(gridExtra)
+```
+
+
+```{r}
+permitstemp <- tempfile()
+
+download("https://github.com/WJC-Data-Science/DTS350/raw/master/permits.csv", permitstemp, mode = "wb")
+
+permits1 <- read_csv(permitstemp)
+
+head(permits1)
+tail(permits1)
+str(permits1)
+
+```
+
+```{r}
+statemutate <- permits1 %>%
+  mutate(state = as.character(state), statepad = str_pad(state, 2, pad = "0")) %>%
+  mutate(county = as.character(county), countypad = str_pad(county, 3, pad = "0")) 
+
+
+head(statemutate)
+```
+
+
+```{r}
+statemutate$geoid <- paste0(statemutate$statepad, statemutate$countypad)
+
+head(statemutate)
+```
+
+
+```{r}
+uscounties <- us_counties()
+
+head(uscounties)
+str(uscounties)
+```
+
+```{r}
+uscounties <- uscounties[, !duplicated(colnames(uscounties))]
+
+str(uscounties)
+```
+
+
+```{r}
+combined <- right_join(uscounties, statemutate, by = "geoid")
+
+head(combined)
+str(combined)
+```
+
+```{r}
+statetotals <- combined %>%
+  summarise(total = mean(value)) %>%
+  select(state_name) 
+  
+
+
+head(statetotals)
+```
+
+```{r}
+MO <- statetotals %>%
+  select(state_name, year, value) %>%
+  filter(state_name == "Missouri")
+
+
+```
+
+
+```{r}
+plot1 <- ggplot(data = MO, mapping = aes(x = year, y = value)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Year", y = "Value", title = "Missouri")
+  
+
+plot1
+
+```
+
+```{r}
+KS <- statetotals %>%
+  select(state_name, year, value) %>%
+  filter(state_name == "Kansas")
+
+
+```
+
+```{r}
+plot2 <- ggplot(data = KS, mapping = aes(x = year, y = value)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Year", y = "Value", title = "Kansas")
+  
+
+plot2
+```
+
+```{r}
+IA <- statetotals %>%
+  select(state_name, year, value) %>%
+  filter(state_name == "Iowa")
+
+
+```
+
+```{r}
+plot3 <- ggplot(data = IA, mapping = aes(x = year, y = value)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Year", y = "Value", title = "Iowa")
+  
+
+plot3
+```
+
+
+```{r}
+NE <- statetotals %>%
+  select(state_name, year, value) %>%
+  filter(state_name == "Nebraska")
+
+
+```
+
+```{r}
+plot4 <- ggplot(data = NE, mapping = aes(x = year, y = value)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Year", y = "Value", title = "Nebraska")
+  
+
+plot4
+```
+
+
+
+```{r}
+grid.arrange(plot1, plot2, plot3, plot4, nrow = 2)
+```
+I chose to make these graphs and arrange them the way I did to clearly see the difference in the 4 states. All relatively close to each other, we can see that Missouri has given the most permits, followed by Kansas, then Iowa, then Nebraska. There was an influx in permits in the late 1980's for Missouri and Kansas, and an influx in Iowa in the early to mid 2000's. Missouri saw a rise every year from 1990 to 2007, and a rise in Kansas from 1991 to 1999. 
+
+All of these states saw drops from 2005 and beyond, and some of this may be due to the financial crisis in 2008. 
+
+All of these have different scales - Missouri up to 8,000; Kansas up to 6,600; Iowa to 5,000; and Nebraska just over 3,000. 
+
+Of course, the points at the height are outliers and only represent a few counties in each respective year, however, each state has them, and therefore, there was no reason to remove these points that strayed from the trend. 
+
+
+
