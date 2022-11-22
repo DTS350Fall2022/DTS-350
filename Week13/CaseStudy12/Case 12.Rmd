@@ -1,0 +1,185 @@
+---
+title: "Case 12"
+author: "Hayden Armour"
+date: "11/17/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load libraries 
+```{r}
+library(knitr)
+library(tidyverse)
+library(downloader)
+library(corrplot)
+library(stringi)
+library(lubridate)
+library(riem)
+library(gifski)
+library(gganimate)
+library(maps)
+library(USAboundaries)
+library(leaflet)
+library(stringr)
+library(plotly)
+library(gridExtra)
+library(sf)
+library(timetk)
+library(dygraphs)
+
+library(ggplot2)
+library(readr)
+library(dplyr)
+library(forcats)
+library(tidyquant)
+```
+
+
+
+```{r}
+unzip("avocado.csv.zip", list = TRUE)
+
+avocado <- read_csv("avocado.csv")
+
+tail(avocado)
+```
+
+```{r}
+unique(avocado$region)
+```
+
+Just regions
+```{r}
+regions <- c("West", "Midsouth", "Northeast", "SouthCentral", "Southeast", "GreatLakes", "Plains")
+
+avocadoregions <- avocado %>%
+  filter(region == regions)
+
+head(avocadoregions)
+
+
+```
+
+Just cities 
+```{r}
+unique(avocado$region)
+
+cities = c("Albany", "Boston", "Chicago", "Denver", "Jacksonville", "NewYork", "Philadelphia", "Portland", "Sacramento", "StLouis", "Atlanta", "Detroit", "LasVegas", "SanDeigo", "Syracuse", "Columbus", "Houston", "GrandRapids", "LosAngeles", "Nashville", "Pittsburgh", "SanFrancisco", "Tampa", "SanDi", "Boise", "Charlotte", "Indianapolis", "Louisville", "Orlando", "Roanoke", "Seattle", "Spokan")
+
+avocadocities <- avocado %>%
+  filter(region == cities) 
+
+head(avocadocities)
+```
+
+States/Areas 
+```{r}
+unique(avocado$region)
+
+state_areas <- c("HarrisburgScranton", "MiamiFtLauderdale", "SouthCarolina", "BuffaloRochester", "CincinnatiDayton", "HartfordSpringfield", "PheonixTuscon", "RaleighGreensboro", "WestTexNewMexico", "BaltimoreWashington", "NorthernNewEngland", "RichmondNorfolk", "DallasFtWorth", "NewOrleansMobile")
+
+avocadoareas <- avocado %>%
+  filter(region == state_areas)
+
+head(avocadoareas)
+```
+
+
+Total US
+```{r}
+unique(avocado$region)
+
+avocadous <- avocado %>%
+  filter(region == "TotalUS")
+
+head(avocadous)
+```
+
+
+
+Avocado Prices for the Total US Plot
+```{r}
+usplot <- ggplot(data = avocadous, mapping = aes(x = Date, y = AveragePrice, color = year)) +
+  geom_line() + 
+  labs(title = "Average Avocado Prices from 2015 to 2018", subtitle = "For the Entire U.S.", x = "Date", y = "Average Price") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5))
+
+usplot
+
+usplot + transition_reveal(Date)
+```
+
+
+
+
+
+Avocado Prices for US Regions Plot - date, average price, total volume
+```{r}
+regionplot <- ggplot(data = avocadoregions, mapping = aes(x = Date, y = AveragePrice, color = `Total Volume`)) +
+  geom_point() + 
+  labs(title = "Average Avocado Prices from 2015 to 2018", subtitle = "For Different US Regions", x = "Date", y = "Average Price") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5)) 
+
+regionplot
+regionplot + transition_time(Date) + shadow_mark(size = 0.5)
+```
+
+
+
+
+
+Avocado Prices for Each US City 
+```{r}
+cityplot <- ggplot(data = avocadocities, mapping = aes(x = Date, y = AveragePrice, color = `Total Volume`)) +
+  geom_line() +
+  facet_wrap(~region) +
+  labs(title = "Average Avocado Prices", subtitle = "From Each US City", x = "Date", y = "Average Price") +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(plot.subtitle = element_text(hjust = .5))
+
+  
+cityplot
+
+avocadocities
+```
+Pittsburgh, Indianapolis, and Portland would be the two best cities to move to, based off avocado prices. They are consistently the lowest, and never exceed 1.5. They fluctuate, but not much, and never over 1.5 - compared to other cities, we see over 2.0 and some over 2.5 and closer to 3.0. 
+
+
+
+Analyze Stock Prices 
+```{r}
+avocado_stock <- tq_get(c("CVGW", "AVO"), get = "stock.prices", from = today()-years(2), to = today())
+
+head(avocado_stock)
+```
+```{r}
+avocadostockplot <- avocado_stock %>%
+  select(symbol, date, adjusted) %>%
+  pivot_wider(names_from = symbol, values_from = adjusted) %>%
+  tk_xts(date_var = date)
+
+head(avocadostockplot)
+```
+
+Stock Price Graph
+```{r}
+dygraph(avocadostockplot, main = "Avocado Stock Prices for Calavo Growers (CVGW) and Mission Produce (AVO)") %>%
+  dyRebase(percent = TRUE) %>%
+  dyShading(from = today()-years(2), to = today()) %>%
+  dyRangeSelector()
+```
+
+From the US plot, we can see that the average prices of avocados in the U.S. fluctuates, and it saw its peak in the 3rd quarter of 2016 and 2nd quarter of 2017. It's lowest prices were seen in the 1st quarter of 2016 and first quarter of 2017 and 2018. We can see a trend that prices tend to be lower in the first and second quarter, and higher in the third and fourth. I chose to do a line graph so that we could see the fluctuations in prices. 
+
+From the region plot, I chose to do a scatter plot so that we could see how price and volume were affected over time. We can see that when volume is larger, the price goes down, and this makes sense because of supply and demand. When there are less avocado's they cost more, and when there are more, they cost less. Again, we see the same trend; prices higher (due to less supply) in the third and fourth quarters, and lower in the first and second. 
+
+When looking at stock prices, AVO performs better. They both follow the same trends, however, AVO's trend takes place higher on the graph, indicating a higher adjusted price. Prices have been going down, for both comapnies, since July of 2021, and have just recently seen a little gain in stock price. If you were to invest, AVO would be the best option, although, it is risky to invest in either company. 
