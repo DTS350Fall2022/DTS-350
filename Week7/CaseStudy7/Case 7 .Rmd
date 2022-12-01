@@ -1,0 +1,208 @@
+---
+title: "Case 7"
+author: "Hayden Armour"
+date: "10/10/2022"
+output: 
+  html_document:
+    keep_md: TRUE
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(readr)
+library(knitr)
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(downloader)
+library(corrplot)
+library(haven)
+library(foreign)
+library(readxl)
+```
+
+
+```{r}
+heights01 <- tempfile()
+
+download.file("https://github.com/WJC-Data-Science/DTS350/raw/master/CaseStudy7Data/heights.csv", "heights01")
+
+readLines('heights01', n = 10)
+
+heights1 <- read.csv("heights01", skip = 2, col_names = c('earn', 'height','sex','ed','age','race'))
+
+head(heights1)
+
+
+
+```
+
+```{r}
+heights02 <- tempfile()
+
+download.file("https://github.com/WJC-Data-Science/DTS350/raw/master/Height.xlsx", 'heights02')
+
+readLines('heights2', n = 10)
+
+heights2 <- read_xlsx("heights02", skip = 2)
+
+head(heights2)
+```
+
+```{r}
+heights3 <- read_dta("https://github.com/WJC-Data-Science/DTS350/raw/master/germanconscr.dta")
+
+head(heights3)
+```
+
+```{r}
+heights4 <- read_dta("https://github.com/WJC-Data-Science/DTS350/raw/master/germanprison.dta")
+
+head(heights4)
+```
+
+```{r}
+heights05 <- tempfile()
+
+download.file("https://github.com/WJC-Data-Science/DTS350/raw/master/CaseStudy7Data/B6090.DBF", "heights05")
+
+heights5 <- read.dbf("heights05")
+
+head(heights5)
+```
+
+```{r}
+heights06 <- tempfile()
+
+download.file("https://github.com/WJC-Data-Science/DTS350/raw/master/CaseStudy7Data/heights.csv", "heights06")
+
+heights6 <- read_csv("heights06", skip = 2, col_names = c('earn', 'height','sex','ed','age','race'))
+
+head(heights6)
+```
+
+
+```{r}
+heights2tidy <- heights2 %>%
+  pivot_longer(3:203, names_to = "years", values_to = "heights.cm", values_drop_na = TRUE) %>%
+  mutate(year_decade = years, height.in = heights.cm / 2.54) %>%
+  separate(years, into = c("century", "decade"), sep = -2) %>%
+  separate(decade, into = c("decade", "year"), sep = -1)
+
+write.csv(heights2tidy, "heights2tidy.csv", row.names = TRUE)
+
+head(heights2tidy)
+```
+
+```{r}
+
+heights3mutate <- heights3 %>%
+  mutate(birth_year = bdec,
+         height.cm = height,
+         height.in = height.cm / 2.54,
+         study_id = 'heights3') %>%
+  select(birth_year, height.cm, height.in, study_id)
+
+
+head(heights3mutate)
+```
+
+```{r}
+heights4mutate <- heights4 %>%
+  mutate(birth_year = bdec,
+         height.cm = height,
+         height.in = height.cm / 2.54,
+         study_id = 'heights4') %>%
+  select(birth_year, height.cm, height.in, study_id)
+
+head(heights4mutate)
+```
+
+```{r}
+heights6mutate <- heights6 %>%
+  mutate(birth_year = 1950,
+         height.cm = height * 2.54,
+         height.in = height,
+         study_id = 'heights6') %>%
+  select(birth_year, height.cm, height.in, study_id)
+
+heights6mutate
+```
+
+
+```{r}
+heights5mutate <- heights5 %>%
+  mutate(birth_year = SJ,
+         height.cm = CMETER,
+         height.in = CMETER / 2.54,
+         study_id = 'heights5') %>%
+  select(birth_year, height.cm, height.in, study_id)
+
+head(heights5mutate)
+```
+
+
+```{r}
+heights6mutate <- heights6 %>%
+  mutate(birth_year = as.numeric(DOBY) + 1900,
+         height.cm = RT216I * 2.54,
+         height.in = RT216I,
+         study_id = 'heights1') %>%
+  select(birth_year, height.cm, height.in, study_id)
+
+head(heights6)
+```
+
+
+
+```{r}
+combinedmutate <- bind_rows(heights2tidy,heights3mutate,heights4mutate,heights5mutate, heights1mutate)
+
+head(combinedmutate)
+
+write.csv(combinedmutate, "Combinedmutated.csv", row.names = TRUE)
+```
+
+```{r}
+filteredgermany <- heights2tidy %>%
+  filter(`Continent, Region, Country` == 'Germany')
+
+head(filteredgermany)
+```
+
+```{r}
+germanyplot <- ggplot(data = heights2tidy, mapping = aes(x = year_decade, y = height.in)) +
+  geom_point(data = filteredgermany, color = "dark green") +
+  geom_smooth(data = filteredgermany, method = 'lm') +
+  labs(x = 'Year by Decade', y = 'Height in Inches', title = 'Germany', subtitle = 'Height by Decade') +
+  theme(bw, plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
+
+germanyplot
+```
+
+```{r}
+multiplesplot <- ggplot(data = combinedmutate, mapping = aes(x = birth_year, y = height.in)) +
+  geom_col()
+
+multiplesplot
+
+ggplot(combinedmutate, aes(x = birth_year, y = height.in)) +
+  geom_col() +
+  facet_wrap(~ study_id, scales = 'free') +
+  theme_bw() +
+  labs(x = "Birth Year", y = "Height in Inches", title="Relationships between Combined Data")
+```
+
+
+
+
+
+
+
+
